@@ -18,9 +18,20 @@
 # limitations under the License.
 #
 
-%w{ nagios-plugins nagios-plugins-basic nagios-plugins-standard }.each do |pkg|
-   package pkg
+case node['platform'] 
+when "debian", "ubuntu"
+  %w{ nagios-plugins nagios-plugins-basic nagios-plugins-standard }.each do |pkg|
+    package pkg
+  end
+
+  package "nagios-nrpe-plugin"
+  
+#might want to rethink this list since we need to look up and run yum install on every single one.
+
+when "centos", "redhat", "fedora"
+  %w{ by_ssh cluster dhcp disk dummy file_age http  load log mrtg mrtgtraf nagios nrpe nt ntp nwstat ping pop procs  sensors ssh smtp swap tcp time users}.each do |pkg|
+    package "nagios-plugins-#{pkg}"
+  end
 end
 
-package "nagios-nrpe-plugin"
 

@@ -22,7 +22,7 @@ include_recipe "apache2"
 include_recipe "apache2::mod_ssl"
 include_recipe "apache2::mod_rewrite"
 include_recipe "icinga::plugins_package"
-include_recipe "icinga::core_source"
+include_recipe "icinga::yum_packages"
 
 sysadmins = search(:users, "groups:#{node['icinga']['sysadmin']} AND icinga_email:*")
 nodes = search(:node, "hostname:[* TO *] AND chef_environment:#{node.chef_environment}")
