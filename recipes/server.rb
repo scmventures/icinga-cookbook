@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # Author:: Marius Ducea (marius@promethost.com)
 # Cookbook Name:: icinga
@@ -29,7 +30,7 @@ nodes = search(:node, "hostname:[* TO *] AND chef_environment:#{node.chef_enviro
 
 if nodes.empty?
   Chef::Log.info("No nodes returned from search, using this node so hosts.cfg has data")
-  nodes = Array.new
+  nodes = Array.new¨¨
   nodes << node
 end
 
@@ -53,7 +54,8 @@ else
   public_domain = node['domain']
 end
 
-template "#{node['icinga']['conf_dir']}/htpasswd.users" do
+# XXX change this to use our SSL users
+template "#{node['icinga']['conf_dir']}/passwd" do
   source "htpasswd.users.erb"
   owner node['icinga']['user']
   group node['apache']['user']
@@ -63,36 +65,49 @@ template "#{node['icinga']['conf_dir']}/htpasswd.users" do
   )
 end
 
-apache_site "000-default" do
-  enable false
+execute "icinga-web-clearcache" do
+  action :nothing
 end
 
-template "#{node['apache']['dir']}/sites-available/icinga.conf" do
-  source "apache2.conf.erb"
-  mode 0644
-  variables :public_domain => public_domain
-  if ::File.symlink?("#{node['apache']['dir']}/sites-enabled/icinga.conf")
-    notifies :reload, "service[apache2]"
-  end
+
+template "#{node['icinga_web']['config_dir']}/databases.xml" do
+  source "databases.xml.erb"
+  mode "0640"
+  group "apache"
+  notifies :reload, "service[apache2]"
+  notifies :run, resources(:execute => "icinga-web-clearcache"), :immediately
 end
 
-apache_site "icinga.conf"
+#apache_site "000-default" do
+#  enable false
+#end
 
-icinga_conf "services" do
-  variables :service_hosts => service_hosts
-end
+#template "#{node['apache']['dir']}/sites-available/icinga.conf" do
+#  source "apache2.conf.erb"
+#  mode 0644
+#  variables :public_domain => public_domain
+#  if ::File.symlink?("#{node['apache']['dir']}/sites-enabled/icinga.conf")
+#    notifies :reload, "service[apache2]"
+#  end
+#end
 
-icinga_conf "contacts" do
-  variables :admins => sysadmins, :members => members
-end
+#apache_site "icinga.conf"
 
-icinga_conf "hostgroups" do
-  variables :roles => role_list
-end
-
-icinga_conf "hosts" do
-  variables :nodes => nodes
-end
+#icinga_conf "services" do
+#  variables :service_hosts => service_hosts
+#end
+#
+#icinga_conf "contacts" do
+#  variables :admins => sysadmins, :members => members
+#end
+#
+#icinga_conf "hostgroups" do
+#  variables :roles => role_list
+#end
+#
+#icinga_conf "hosts" do
+#  variables :nodes => nodes
+#end
 
 service "icinga" do
   supports :status => true, :restart => true, :reload => true

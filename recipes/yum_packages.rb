@@ -1,6 +1,6 @@
 include_recipe "yum::repoforge"
 
-%w{icinga icinga-gui icinga-doc}.each do |pkg|
+%w{icinga icinga-web icinga-doc php-pgsql}.each do |pkg|
   package pkg do 
     action :install
   end
