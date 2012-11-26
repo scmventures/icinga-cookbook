@@ -29,7 +29,7 @@ when "debian", "ubuntu"
 #might want to rethink this list since we need to look up and run yum install on every single one.
 
 when "centos", "redhat", "fedora"
-  %w{disk dummy file_age http nrpe load ping users procs}.each do |pkg|
+  %w{disk dummy file_age http nrpe load ping users procs swap ssh tcp}.each do |pkg|
     package "nagios-plugins-#{pkg}"
   end
 end
