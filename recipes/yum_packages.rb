@@ -6,3 +6,5 @@ include_recipe "yum::repoforge"
   end
 end
 
+#depends on pgdg...
+package "check_postgres" 
