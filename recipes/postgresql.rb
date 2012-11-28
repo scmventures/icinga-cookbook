@@ -51,7 +51,7 @@ ruby_block "load_icinga_ddl" do
                      :dbname => node[:icinga][:ido2db][:dbname]
                      )
     if db.query("select * from pg_tables where schemaname = 'public' AND tablename = 'icinga_configfiles'").num_tuples== 0
-      db.query(IO.read("/usr/share/doc/icinga-idoutils-libdbi-pgsql-1.7.2/db/pgsql/pgsql.sql").gsub('SQL', 'sql'))
+      db.query(IO.read("/usr/share/doc/icinga-idoutils-libdbi-pgsql-1.8.2/db/pgsql/pgsql.sql").gsub('SQL', 'sql'))
     end
   end
 end
