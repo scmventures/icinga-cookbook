@@ -1,4 +1,3 @@
-include_recipe "yum::repoforge"
 include_recipe "postgresql::server"
 chef_gem "pg" do
   options("-- --with-pg-config=/usr/pgsql-9.2/bin/pg_config")
@@ -51,7 +50,7 @@ ruby_block "load_icinga_ddl" do
                      :dbname => node[:icinga][:ido2db][:dbname]
                      )
     if db.query("select * from pg_tables where schemaname = 'public' AND tablename = 'icinga_configfiles'").num_tuples== 0
-      db.query(IO.read("/usr/share/doc/icinga-idoutils-libdbi-pgsql-1.7.2/db/pgsql/pgsql.sql").gsub('SQL', 'sql'))
+      db.query(IO.read("/usr/share/doc/icinga-idoutils-libdbi-pgsql-1.8.4/db/pgsql/pgsql.sql").gsub('SQL', 'sql'))
     end
   end
 end
@@ -66,7 +65,8 @@ ruby_block "load_icinga_web_ddl" do
                      :dbname => node[:icinga][:web_db][:dbname]
                      )
     if db.query("select * from pg_tables where schemaname = 'public' AND tablename = 'cronk'").num_tuples== 0
-      db.query(IO.read("/usr/share/icinga-web/etc/schema/pgsql.sql"))
+# db.query doesn't work since this script uses psql batch variables.
+      %x{psql --username=postgres < /usr/share/icinga-web/etc/schema/pgsql.sql}
     end
   end
 end
