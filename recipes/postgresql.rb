@@ -66,7 +66,7 @@ ruby_block "load_icinga_web_ddl" do
                      )
     if db.query("select * from pg_tables where schemaname = 'public' AND tablename = 'cronk'").num_tuples== 0
 # db.query doesn't work since this script uses psql batch variables.
-      %x{psql --username=postgres < /usr/share/icinga-web/etc/schema/pgsql.sql}
+      %x{psql --username=postgres #{node[:icinga][:web_db][:dbname]} < /usr/share/icinga-web/etc/schema/pgsql.sql}
     end
   end
 end
